@@ -1,8 +1,6 @@
 package gamelogic;
 
-import java.util.Comparator;
-
-public class Player implements PlayerInterface {
+public class Player implements PlayerInterface, Comparable<Player> {
     private String name;
     private int score;
 
@@ -21,16 +19,14 @@ public class Player implements PlayerInterface {
         return score;
     }
 
-    public static Comparator<Player> highScoreCompare = new Comparator<Player>() {
-        @Override
-        public int compare(Player p1, Player p2) {
-            return Integer.compare(p2.getScore(), p1.getScore());
-        }
-    };
+    @Override
+    public int compareTo(Player other) {
+        // Sortiraj po bodovima u opadajućem redosledu
+        return Integer.compare(other.getScore(), this.getScore());
+    }
 
     @Override
     public String toString() {
         return name + " " + score;
     }
 }
-

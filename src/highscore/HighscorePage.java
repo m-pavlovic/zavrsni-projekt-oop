@@ -1,18 +1,12 @@
 package highscore;
-
-import gamelogic.PlayAgainButtonAction;
 import gamelogic.Player;
 import gamelogic.PlayerInterface;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class HighscorePage extends JFrame implements HighscoreInterface {
     private JTextArea scores;
@@ -51,12 +45,13 @@ public class HighscorePage extends JFrame implements HighscoreInterface {
             JOptionPane.showMessageDialog(this, "Error reading highscores file.", "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-        Collections.sort(highestScore); // ?? 
-        scores.setText(""); // Clear previous scores
+
+        // Sortiraj listu koristeći implementaciju Comparable u klasi Player
+        Collections.sort(highestScore, (a, b) -> ((Player) b).getScore() - ((Player) a).getScore());
+
+        scores.setText(""); // Očisti prethodne rezultate
         for (int i = 0; i < limit && i < highestScore.size(); i++) {
             scores.append((i + 1) + ".) " + highestScore.get(i).toString() + "\n");
         }
     }
 }
-
-
