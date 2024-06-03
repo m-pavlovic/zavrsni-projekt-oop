@@ -1,14 +1,13 @@
 package gamelogic;
 
 import javax.swing.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class PlayButtonAction implements ActionListener {
-
     private IndexPage indexPage;
     private JTextField enterName;
+
     public PlayButtonAction(IndexPage indexPage, JTextField enterName) {
         this.indexPage = indexPage;
         this.enterName = enterName;
@@ -25,5 +24,4 @@ public class PlayButtonAction implements ActionListener {
             indexPage.dispose();
         }
     }
-
 }

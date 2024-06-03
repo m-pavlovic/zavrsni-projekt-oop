@@ -18,7 +18,6 @@ public class IndexPage extends JFrame {
 
     public IndexPage() throws HeadlessException {
 
-
         super("Welcome");
         setSize(800, 480);
         setVisible(true);

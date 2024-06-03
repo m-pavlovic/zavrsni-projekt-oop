@@ -2,7 +2,7 @@ package highscore;
 
 import gamelogic.PlayAgainButtonAction;
 import gamelogic.Player;
-
+import gamelogic.PlayerInterface;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,48 +14,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class HighscorePage extends JFrame {
-    private List<Player> highestScore;
-    private JButton playAgainButton;
+public class HighscorePage extends JFrame implements HighscoreInterface {
     private JTextArea scores;
-    Font f = new Font("serif",Font.PLAIN, 26);
+    private ArrayList<PlayerInterface> highestScore;
+
     public HighscorePage() {
-
-        setTitle("Hangman");
-        setPreferredSize(new Dimension(800, 480));
+        setTitle("Highscores");
+        setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        setResizable(false);
         setLocationRelativeTo(null);
-        setVisible(true);
-
-
-        // Top players label
-        JLabel title = new JLabel("Top 10 players");
-        title.setHorizontalAlignment(JLabel.CENTER);
-        add(title, BorderLayout.NORTH);
-
+        setResizable(false);
         scores = new JTextArea();
-        scores.setEditable(false);
-        //scores.setPreferredSize(new Dimension(500, 380));
+        add(new JScrollPane(scores));
         setScores(10);
-        scores.setFont(f);
-        add(new JScrollPane(scores), BorderLayout.CENTER);
+    }
 
-        // Table of scores
-        String[] columns = {"Name", "Score"};
-
-        // Menu and Play Again buttons
-        JPanel filler = new JPanel();
-
-        playAgainButton = new JButton("Play Again");
-        filler.add(playAgainButton,BorderLayout.CENTER);
-        add(filler,BorderLayout.SOUTH);
-
-        pack();
-
-        playAgainButton.addActionListener(new PlayAgainButtonAction(this));
-    }private void setScores(int limit) {
+    @Override
+    public void setScores(int limit) {
         highestScore = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("data/highscores"))) {
             String line;
@@ -66,11 +41,9 @@ public class HighscorePage extends JFrame {
                         int score = Integer.parseInt(parts[1]);
                         highestScore.add(new Player(parts[0], score));
                     } catch (NumberFormatException e) {
-                        // Log error and continue to the next line
                         System.err.println("Invalid score format: " + parts[1]);
                     }
                 } else {
-                    // Log error and continue to the next line
                     System.err.println("Invalid line format: " + line);
                 }
             }
@@ -78,11 +51,12 @@ public class HighscorePage extends JFrame {
             JOptionPane.showMessageDialog(this, "Error reading highscores file.", "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-        Collections.sort(highestScore, Player.highScoreCompare);
+        Collections.sort(highestScore); // ?? 
+        scores.setText(""); // Clear previous scores
         for (int i = 0; i < limit && i < highestScore.size(); i++) {
-            scores.append((i + 1) + ".) " + highestScore.get(i).toString());
+            scores.append((i + 1) + ".) " + highestScore.get(i).toString() + "\n");
         }
     }
-
 }
+
 
