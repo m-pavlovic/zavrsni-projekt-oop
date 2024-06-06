@@ -82,37 +82,47 @@ public class Game {
         frame.add(rightPanel, BorderLayout.CENTER);
 
         JPanel inputPanel = new JPanel(new FlowLayout());
-        letterInput = new JTextField(1);
+        letterInput = new JTextField(10);  // Increased the input area for more characters
         JButton submitButton = new JButton("Guess");
         submitButton.addActionListener(new GuessButtonAction(this));
-        inputPanel.add(new JLabel("Guess a letter:"));
+        inputPanel.add(new JLabel("Guess a letter or the word:"));
         inputPanel.add(letterInput);
         inputPanel.add(submitButton);
 
         frame.add(inputPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
-
     }
 
     public void handleGuess() {
-        String letter = letterInput.getText().toUpperCase();
-        if (letter.length() != 1 || triedLettersList.contains(letter.charAt(0))) {
-            JOptionPane.showMessageDialog(frame, "Enter a valid, new letter!");
-            letterInput.setText("");
-            return;
-        }
-
-        triedLettersList.add(letter.charAt(0));
-        if (wordToGuess.contains(letter)) {
-            wordDisplay.setText(generateWordDisplay());
+        String input = letterInput.getText().toUpperCase();
+        if (input.length() == 1) {
+            char letter = input.charAt(0);
+            if (triedLettersList.contains(letter) || !Character.isLetter(letter)) {
+                JOptionPane.showMessageDialog(frame, "Enter a valid, new letter!");
+                letterInput.setText("");
+                return;
+            }
+            triedLettersList.add(letter);
+            if (wordToGuess.contains(String.valueOf(letter))) {
+                wordDisplay.setText(generateWordDisplay());
+            } else {
+                incorrectGuesses++;
+                missedLetters.append(letter + ", ");
+                updateGallows();
+            }
         } else {
-            incorrectGuesses++;
-            missedLetters.append(letter + ", ");
-            updateGallows();
+            if (input.equals(wordToGuess)) {
+                wordDisplay.setText(wordToGuess);
+                score += 10;
+                endGame(true);
+            } else {
+                incorrectGuesses++;
+                JOptionPane.showMessageDialog(frame, "Incorrect guess!");
+                updateGallows();
+            }
         }
         letterInput.setText("");
-
         checkGameEnd();
     }
 
@@ -120,7 +130,7 @@ public class Game {
         StringBuilder display = new StringBuilder();
         for (char c : wordToGuess.toCharArray()) {
             if (c == ' ') {
-                display.append("    ");  // Dodajte dva razmaka za razmake u riječi
+                display.append("    ");  // Add spaces for spaces in the word
             } else if (triedLettersList.contains(c)) {
                 display.append(c).append(" ");
             } else {
@@ -132,37 +142,37 @@ public class Game {
 
     private void drawGallows(Graphics g) {
         g.setColor(Color.BLACK);
-        g.drawLine(0, 0, 0, 200);   // stub
-        g.drawLine(0, 0, 100, 0);  // gornji prečnik
-        g.drawLine(100, 0, 100, 20); // vješalo
+        g.drawLine(0, 0, 0, 200);   // pole
+        g.drawLine(0, 0, 100, 0);  // top beam
+        g.drawLine(100, 0, 100, 20); // rope
 
-        // Glava (nakon 1. pogreške)
+        // Head (after 1st wrong guess)
         if (incorrectGuesses >= 1) {
             g.drawOval(80, 20, 40, 40);
         }
 
-        // Tijelo (nakon 2. pogreške)
+        // Body (after 2nd wrong guess)
         if (incorrectGuesses >= 2) {
             g.drawLine(100, 60, 100, 120);
         }
 
-        // Lijeva ruka (nakon 3. pogreške)
+        // Left arm (after 3rd wrong guess)
         if (incorrectGuesses >= 3) {
             g.drawLine(100, 60, 70, 100);
         }
 
-        // Desna ruka (nakon 4. pogreške)
+        // Right arm (after 4th wrong guess)
         if (incorrectGuesses >= 4) {
             g.drawLine(100, 60, 130, 100);
         }
 
-        // Lijeva noga (nakon 5. pogreške)
+        // Left leg (after 5th wrong guess)
         if (incorrectGuesses >= 5) {
-            g.drawLine(100, 120, 70, 170);  // lijeva noga
+            g.drawLine(100, 120, 70, 170);  // left leg
         }
-        // Desna noga (nakon 6. pogreške)
+        // Right leg (after 6th wrong guess)
         if (incorrectGuesses >= 6) {
-            g.drawLine(100, 120, 130, 170); // desna noga
+            g.drawLine(100, 120, 130, 170); // right leg
         }
     }
 
@@ -196,15 +206,10 @@ public class Game {
         }
     }
 
-    private void updateScoreLabel() {
-        scoreLabel.setText("Score: " + score);
-    }
-
     private void checkGameEnd() {
         if (wordDisplay.getText().replace(" ", "").equals(wordToGuess)) {
             score += 10;
             updateScoreLabel();
-
             int choice = JOptionPane.showConfirmDialog(frame, "You guessed the word! Continue?", "Game over", JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
                 triedLettersList.clear();
@@ -220,21 +225,28 @@ public class Game {
                 incorrectGuesses = 0;
                 missedLetters.setText("Missed Letters: \n");
                 updateGallows();
-
             } else {
-                saveScore();
-                saveToFile();
-                frame.dispose();
-                new HighscorePage().setVisible(true);
+                endGame(false);
             }
-
         } else if (incorrectGuesses >= 6) {
             JOptionPane.showMessageDialog(frame, "Game over, you lost! The word was: " + wordToGuess);
-            saveScore();
-            saveToFile();
-            frame.dispose();
-            new HighscorePage().setVisible(true);
+            endGame(false);
         }
+    }
+
+    private void endGame(boolean guessedWord) {
+        if (guessedWord) {
+            score += 10;
+            updateScoreLabel();
+        }
+        saveScore();
+        saveToFile();
+        frame.dispose();
+        new HighscorePage().setVisible(true);
+    }
+
+    private void updateScoreLabel() {
+        scoreLabel.setText("Score: " + score);
     }
 
     public HashMap<String, Integer> saveScore() {
