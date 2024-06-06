@@ -106,6 +106,12 @@ public class Game {
             triedLettersList.add(letter);
             if (wordToGuess.contains(String.valueOf(letter))) {
                 wordDisplay.setText(generateWordDisplay());
+                if (wordDisplay.getText().replace(" ", "").equals(wordToGuess)) {
+                    score += 10;
+                    updateScoreLabel();
+                    continueOrEndGame(true);
+                    return;
+                }
             } else {
                 incorrectGuesses++;
                 missedLetters.append(letter + ", ");
@@ -115,7 +121,9 @@ public class Game {
             if (input.equals(wordToGuess)) {
                 wordDisplay.setText(wordToGuess);
                 score += 10;
-                endGame(true);
+                updateScoreLabel();
+                continueOrEndGame(true);
+                return;
             } else {
                 incorrectGuesses++;
                 JOptionPane.showMessageDialog(frame, "Incorrect guess!");
@@ -123,7 +131,33 @@ public class Game {
             }
         }
         letterInput.setText("");
-        checkGameEnd();
+        if (incorrectGuesses >= 6) {
+            JOptionPane.showMessageDialog(frame, "Game over, you lost! The word was: " + wordToGuess);
+            endGame();
+        }
+    }
+
+    private void continueOrEndGame(boolean guessedWord) {
+        if (guessedWord) {
+            JOptionPane.showMessageDialog(frame, "Congratulations! You guessed the word!");
+            int choice = JOptionPane.showConfirmDialog(frame, "Continue?", "Game over", JOptionPane.YES_NO_OPTION);
+            if (choice == JOptionPane.YES_OPTION) {
+                triedLettersList.clear();
+                List<String> words = categoriesMap.get(category);
+                if (words != null && !words.isEmpty()) {
+                    int randomIndex = new Random().nextInt(words.size());
+                    wordToGuess = words.get(randomIndex).toUpperCase();
+                } else {
+                    wordToGuess = "EXAMPLE";
+                }
+                wordDisplay.setText(generateWordDisplay());
+                incorrectGuesses = 0;
+                missedLetters.setText("Missed Letters: \n");
+                updateGallows();
+                return;
+            }
+        }
+        endGame();
     }
 
     private String generateWordDisplay() {
@@ -206,39 +240,7 @@ public class Game {
         }
     }
 
-    private void checkGameEnd() {
-        if (wordDisplay.getText().replace(" ", "").equals(wordToGuess)) {
-            score += 10;
-            updateScoreLabel();
-            int choice = JOptionPane.showConfirmDialog(frame, "You guessed the word! Continue?", "Game over", JOptionPane.YES_NO_OPTION);
-            if (choice == JOptionPane.YES_OPTION) {
-                triedLettersList.clear();
-                List<String> words = categoriesMap.get(category);
-                if (words != null && !words.isEmpty()) {
-                    int randomIndex = new Random().nextInt(words.size());
-                    wordToGuess = words.get(randomIndex).toUpperCase();
-                } else {
-                    wordToGuess = "EXAMPLE"; // fallback word in case the category doesn't exist or has no words
-                }
-                wordDisplay.setText(generateWordDisplay());
-                triedLettersList.clear();
-                incorrectGuesses = 0;
-                missedLetters.setText("Missed Letters: \n");
-                updateGallows();
-            } else {
-                endGame(false);
-            }
-        } else if (incorrectGuesses >= 6) {
-            JOptionPane.showMessageDialog(frame, "Game over, you lost! The word was: " + wordToGuess);
-            endGame(false);
-        }
-    }
-
-    private void endGame(boolean guessedWord) {
-        if (guessedWord) {
-            score += 10;
-            updateScoreLabel();
-        }
+    private void endGame() {
         saveScore();
         saveToFile();
         frame.dispose();
