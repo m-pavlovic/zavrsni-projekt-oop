@@ -1,4 +1,5 @@
-package highscore;
+package gamelogic;
+import gamelogic.HighscoreInterface;
 import gamelogic.Player;
 import gamelogic.PlayerInterface;
 import javax.swing.*;

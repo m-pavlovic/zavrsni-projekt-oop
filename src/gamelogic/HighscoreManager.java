@@ -1,4 +1,4 @@
-package highscore;
+package gamelogic;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

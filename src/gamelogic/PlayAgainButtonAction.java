@@ -1,7 +1,5 @@
 package gamelogic;
 
-import highscore.HighscorePage;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
