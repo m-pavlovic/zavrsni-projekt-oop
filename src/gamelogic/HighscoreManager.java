@@ -76,7 +76,7 @@ public class HighscoreManager {
 
         @Override
         public int compareTo(Score other) {
-            return other.score - this.score; // descending order
+            return Integer.compare(other.score, this.score); // descending order
         }
     }
 }

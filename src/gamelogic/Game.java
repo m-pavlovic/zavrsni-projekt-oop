@@ -1,6 +1,5 @@
 package gamelogic;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
@@ -34,18 +33,13 @@ public class Game {
         loadWordsFromFile();
         List<String> words = categoriesMap.get(category);
         if (words != null && !words.isEmpty()) {
-            int randomIndex = new Random().nextInt(words.size()-1);
+            int randomIndex = new Random().nextInt(words.size());
             wordToGuess = words.get(randomIndex).toUpperCase();
             System.out.println(wordToGuess);
         } else {
             wordToGuess = "EXAMPLE"; // fallback word in case the category doesn't exist or has no words
         }
         initializeGUI();
-//        int i= 0;
-//        for (String s : words){
-//            System.out.println(i + " " + s);
-//            i++;
-//        }
     }
 
     private void initializeGUI() {
@@ -135,6 +129,7 @@ public class Game {
         }
         return display.toString();
     }
+
     private void drawGallows(Graphics g) {
         g.setColor(Color.BLACK);
         g.drawLine(0, 0, 0, 200);   // stub
@@ -161,15 +156,15 @@ public class Game {
             g.drawLine(100, 60, 130, 100);
         }
 
-        // Noge (nakon 5. pogreške)
+        // Lijeva noga (nakon 5. pogreške)
         if (incorrectGuesses >= 5) {
             g.drawLine(100, 120, 70, 170);  // lijeva noga
         }
+        // Desna noga (nakon 6. pogreške)
         if (incorrectGuesses >= 6) {
             g.drawLine(100, 120, 130, 170); // desna noga
         }
     }
-
 
     private void updateGallows() {
         gallowsPanel.repaint();
@@ -177,8 +172,7 @@ public class Game {
 
     private void loadWordsFromFile() {
         String currentCategory = "";
-        try {
-            BufferedReader br = new BufferedReader(new FileReader("data/words"));
+        try (BufferedReader br = new BufferedReader(new FileReader("data/words"))) {
             String line;
             List<String> words = null;
             while ((line = br.readLine()) != null) {
@@ -189,7 +183,7 @@ public class Game {
                     currentCategory = line.substring(1, line.length() - 1);
                     words = new ArrayList<>();
                 } else {
-                    if (words != null ) {
+                    if (words != null) {
                         words.add(line);
                     }
                 }
@@ -197,13 +191,9 @@ public class Game {
             if (words != null && !words.isEmpty()) {
                 categoriesMap.put(currentCategory, words);
             }
-            br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-    public void setVisible(boolean b) {
-        frame.setVisible(b);
     }
 
     private void updateScoreLabel() {
@@ -235,7 +225,7 @@ public class Game {
                 saveScore();
                 saveToFile();
                 frame.dispose();
-                new HighscorePage();
+                new HighscorePage().setVisible(true);
             }
 
         } else if (incorrectGuesses >= 6) {
@@ -243,10 +233,9 @@ public class Game {
             saveScore();
             saveToFile();
             frame.dispose();
-            new HighscorePage();
+            new HighscorePage().setVisible(true);
         }
     }
-
 
     public HashMap<String, Integer> saveScore() {
         HashMap<String, Integer> scores = new HashMap<>();
@@ -256,20 +245,12 @@ public class Game {
 
     public void saveToFile() {
         HashMap<String, Integer> scores = saveScore();
-        try {
-            FileWriter writer = new FileWriter("data/highscores", true);
+        try (FileWriter writer = new FileWriter("data/highscores", true)) {
             for (String name : scores.keySet()) {
                 writer.write(name + " " + scores.get(name) + "\n");
             }
-            writer.close();
         } catch (IOException e) {
             System.out.println("Error writing to file");
         }
     }
-
 }
-
-
-
-
-

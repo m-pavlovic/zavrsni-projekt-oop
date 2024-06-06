@@ -3,14 +3,9 @@ package gamelogic;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ExitButtonAction implements ActionListener {
+import java.awt.event.ActionEvent;
 
-    private IndexPage idx;
-
-    public ExitButtonAction(IndexPage idx) {
-        this.idx = idx;
-    }
-
+public class ExitButtonAction implements ExitButtonActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.exit(0);

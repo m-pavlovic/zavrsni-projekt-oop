@@ -1,7 +1,5 @@
 package gamelogic;
-import gamelogic.HighscoreInterface;
-import gamelogic.Player;
-import gamelogic.PlayerInterface;
+
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -47,10 +45,10 @@ public class HighscorePage extends JFrame implements HighscoreInterface {
             e.printStackTrace();
         }
 
-        // Sortiraj listu koristeći implementaciju Comparable u klasi Player
-        Collections.sort(highestScore, (a, b) -> ((Player) b).getScore() - ((Player) a).getScore());
+        // Sort the list using the Comparable implementation in the Player class
+        Collections.sort(highestScore, (a, b) -> Integer.compare(((Player) b).getScore(), ((Player) a).getScore()));
 
-        scores.setText(""); // Očisti prethodne rezultate
+        scores.setText(""); // Clear previous results
         for (int i = 0; i < limit && i < highestScore.size(); i++) {
             scores.append((i + 1) + ".) " + highestScore.get(i).toString() + "\n");
         }

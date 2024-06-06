@@ -1,11 +1,11 @@
 package gamelogic;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class IndexPage extends JFrame {
@@ -14,17 +14,15 @@ public class IndexPage extends JFrame {
     public static JComboBox<String> categoryComboBox = new JComboBox<>();
     private JTextField enterName = new JTextField();
     static boolean con = true;
-    //private PlayButtonListener playButtonListener;
 
     public IndexPage() throws HeadlessException {
-
         super("Welcome");
         setSize(800, 480);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
 
-        if(con) loadCategories();
+        if (con) loadCategories();
         con = false;
 
         add(initTopPanel(), BorderLayout.NORTH);
@@ -32,17 +30,11 @@ public class IndexPage extends JFrame {
         add(initRightPanel(), BorderLayout.EAST);
         add(initBotPanel(), BorderLayout.SOUTH);
 
-        // Centrirati igru po srediti ekrana
+        // Center the game on the screen
         setLocationRelativeTo(null);
 
-
         JPanel panel = (JPanel) initBotPanel();
-
         add(panel, BorderLayout.SOUTH);
-
-
-
-
     }
 
     private Component initTopPanel() {
@@ -59,15 +51,14 @@ public class IndexPage extends JFrame {
         JButton b2 = new JButton("Exit");
         panel.add(b1);
 
-        b1.addActionListener(new PlayButtonAction(this,enterName));
+        b1.addActionListener(new PlayButtonAction(this, enterName));
         panel.add(b2);
         panel.add(Box.createVerticalStrut(120));
-        b2.addActionListener(new ExitButtonAction(this));
+        b2.addActionListener(new ExitButtonAction());
         return panel;
     }
 
     private Component initLeftPanel() {
-
         JLabel label1 = new JLabel("GAME RULES");
         label1.setFont(f);
         JLabel label2 = new JLabel("Guess the hidden word or phrase by entering letters.");
@@ -109,9 +100,9 @@ public class IndexPage extends JFrame {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine().trim();
 
-                // Provjera počinje li linija s '[' i završava li s ']'
+                // Check if the line starts with '[' and ends with ']'
                 if (line.startsWith("[") && line.endsWith("]")) {
-                    // Uklanjanje znakova '[' i ']' te dodavanje kategorije u comboBox
+                    // Remove '[' and ']' and add the category to the comboBox
                     String category = line.substring(1, line.length() - 1);
                     categoryComboBox.addItem(category);
                 }
@@ -120,6 +111,4 @@ public class IndexPage extends JFrame {
             e.printStackTrace();
         }
     }
-
 }
-

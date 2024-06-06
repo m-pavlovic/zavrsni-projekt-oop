@@ -2,9 +2,8 @@ package gamelogic;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class PlayButtonAction implements ActionListener {
+public class PlayButtonAction implements PlayButtonActionListener {
     private IndexPage indexPage;
     private JTextField enterName;
 
