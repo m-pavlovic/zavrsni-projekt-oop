@@ -23,7 +23,11 @@ public class HighscorePage extends JFrame {
         JScrollPane scrollPane = new JScrollPane(scoreTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        loadScores(showCurrentPlayerOnly ? game.getPlayerName() : null);
+        if (showCurrentPlayerOnly) {
+            loadPlayerStats(game.getPlayerName());
+        } else {
+            loadScores(null);
+        }
 
         JPanel buttonPanel = new JPanel();
         JButton homeButton = new JButton("Home Screen");
@@ -88,6 +92,51 @@ public class HighscorePage extends JFrame {
             }
             Object[] rowData = {
                     stats.getPlayerName(),
+                    stats.getScore(),
+                    stats.getWordsGuessed(),
+                    stats.getGamesPlayed(),
+                    categoryScores.toString()
+            };
+            model.addRow(rowData);
+        }
+        scoreTable.setModel(model);
+    }
+
+    private void loadPlayerStats(String playerName) {
+        playerStatsList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(Game.STATS_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(" ");
+                if (parts.length >= 4 && parts[0].equals(playerName)) {
+                    int score = Integer.parseInt(parts[1]);
+                    int wordsGuessed = Integer.parseInt(parts[2]);
+                    int gamesPlayed = Integer.parseInt(parts[3]);
+                    PlayerStats playerStats = new PlayerStats(playerName, score, wordsGuessed, gamesPlayed);
+
+                    for (int i = 4; i < parts.length; i++) {
+                        String[] categoryScore = parts[i].split(":");
+                        if (categoryScore.length == 2) {
+                            playerStats.addCategoryScore(categoryScore[0], Integer.parseInt(categoryScore[1]));
+                        }
+                    }
+                    playerStatsList.add(playerStats);
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error reading statistics file.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        Collections.sort(playerStatsList);
+
+        String[] columnNames = {"Score", "Words Guessed", "Games Played", "Category Scores"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+        for (PlayerStats stats : playerStatsList) {
+            StringBuilder categoryScores = new StringBuilder();
+            for (String category : stats.getCategoryScores().keySet()) {
+                categoryScores.append(category).append(": ").append(stats.getCategoryScores().get(category)).append(" ");
+            }
+            Object[] rowData = {
                     stats.getScore(),
                     stats.getWordsGuessed(),
                     stats.getGamesPlayed(),
