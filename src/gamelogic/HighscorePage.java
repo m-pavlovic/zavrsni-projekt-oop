@@ -5,8 +5,7 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
@@ -14,7 +13,7 @@ public class HighscorePage extends JFrame {
     private JTable scoreTable;
     private List<PlayerStats> playerStatsList;
 
-    public HighscorePage(Game game) {
+    public HighscorePage(Game game, boolean showCurrentPlayerOnly) {
         setTitle("Highscores");
         setSize(800, 480);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -24,7 +23,7 @@ public class HighscorePage extends JFrame {
         JScrollPane scrollPane = new JScrollPane(scoreTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        loadScores();
+        loadScores(showCurrentPlayerOnly ? game.getPlayerName() : null);
 
         JPanel buttonPanel = new JPanel();
         JButton homeButton = new JButton("Home Screen");
@@ -49,7 +48,7 @@ public class HighscorePage extends JFrame {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private void loadScores() {
+    private void loadScores(String filterPlayer) {
         playerStatsList = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(Game.STATS_FILE))) {
             String line;
@@ -57,6 +56,9 @@ public class HighscorePage extends JFrame {
                 String[] parts = line.split(" ");
                 if (parts.length >= 4) {
                     String playerName = parts[0];
+                    if (filterPlayer != null && !filterPlayer.equals(playerName)) {
+                        continue;
+                    }
                     int score = Integer.parseInt(parts[1]);
                     int wordsGuessed = Integer.parseInt(parts[2]);
                     int gamesPlayed = Integer.parseInt(parts[3]);

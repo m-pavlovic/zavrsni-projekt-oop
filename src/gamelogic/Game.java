@@ -244,7 +244,7 @@ public class Game {
     private void endGame() {
         saveScore();
         frame.dispose();
-        new HighscorePage(this).setVisible(true);
+        new HighscorePage(this, false).setVisible(true);
     }
 
     private void updateScoreLabel() {
@@ -264,35 +264,18 @@ public class Game {
     }
 
     public void showAllPlayersStats() {
-        new HighscorePage(this).setVisible(true);
+        new HighscorePage(this, false).setVisible(true);
     }
 
     public void showPlayerStats() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(STATS_FILE))) {
-            String line;
-            StringBuilder stats = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith(playerName)) {
-                    String[] parts = line.split(" ");
-                    if (parts.length >= 4) {
-                        stats.append("Player: ").append(parts[0]).append("\n");
-                        stats.append("Score: ").append(parts[1]).append("\n");
-                        stats.append("Words Guessed: ").append(parts[2]).append("\n");
-                        stats.append("Games Played: ").append(parts[3]).append("\n");
-                        stats.append("Category Scores:\n");
-                        for (int i = 4; i < parts.length; i++) {
-                            stats.append(parts[i]).append("\n");
-                        }
-                    }
-                }
-            }
-            JOptionPane.showMessageDialog(frame, stats.toString(), "My Stats", JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Error reading statistics file", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        new HighscorePage(this, true).setVisible(true);
     }
 
     public void setVisible(boolean visible) {
         frame.setVisible(visible);
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 }
