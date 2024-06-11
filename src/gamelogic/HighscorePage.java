@@ -10,75 +10,78 @@ import java.util.Collections;
 import java.util.List;
 
 public class HighscorePage extends JFrame {
-    private List<Player> highestScore;
-    private JButton playAgainButton;
     private JTextArea scores;
-    Font f = new Font("serif", Font.PLAIN, 26);
+    private List<PlayerStats> playerStatsList;
 
-    public HighscorePage() {
-        setTitle("Hangman");
-        setPreferredSize(new Dimension(800, 480));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        setResizable(false);
-
-
-        // Top players label
-        JLabel title = new JLabel("Top 10 players");
-        title.setHorizontalAlignment(JLabel.CENTER);
-        add(title, BorderLayout.NORTH);
+    public HighscorePage(Game game) {
+        setTitle("Highscores");
+        setSize(800, 480);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         scores = new JTextArea();
         scores.setEditable(false);
-        scores.setFont(f);
         add(new JScrollPane(scores), BorderLayout.CENTER);
 
-        // Menu and Play Again buttons
-        JPanel filler = new JPanel();
-        playAgainButton = new JButton("Play Again");
-        filler.add(playAgainButton, BorderLayout.CENTER);
-        add(filler, BorderLayout.SOUTH);
+        loadScores();
 
-        pack();
-        setVisible(true);
+        JPanel buttonPanel = new JPanel();
+        JButton homeButton = new JButton("Home Screen");
+        JButton backButton = new JButton("Back to the Game");
+        JButton exitButton = new JButton("Exit");
 
-        playAgainButton.addActionListener(new PlayAgainButtonAction(this));
+        homeButton.addActionListener(e -> {
+            dispose();
+            new IndexPage().setVisible(true);
+        });
 
-        // Load and display scores
-        setScores(10);
-        setLocationRelativeTo(null);
+        backButton.addActionListener(e -> {
+            dispose();
+            game.setVisible(true);
+        });
+
+        exitButton.addActionListener(e -> System.exit(0));
+
+        buttonPanel.add(homeButton);
+        buttonPanel.add(backButton);
+        buttonPanel.add(exitButton);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private void setScores(int limit) {
-        highestScore = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("data/highscores"))) {
+    private void loadScores() {
+        playerStatsList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(Game.STATS_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("\\s+");
-                if (parts.length >= 2 && !parts[1].isEmpty()) {
-                    try {
-                        int score = Integer.parseInt(parts[1]);
-                        highestScore.add(new Player(parts[0], score));
-                    } catch (NumberFormatException e) {
-                        // Log error and continue to the next line
-                        System.err.println("Invalid score format: " + parts[1]);
+                String[] parts = line.split(" ");
+                if (parts.length >= 4) {
+                    String playerName = parts[0];
+                    int score = Integer.parseInt(parts[1]);
+                    int wordsGuessed = Integer.parseInt(parts[2]);
+                    int gamesPlayed = Integer.parseInt(parts[3]);
+                    PlayerStats playerStats = new PlayerStats(playerName, score, wordsGuessed, gamesPlayed);
+
+                    for (int i = 4; i < parts.length; i++) {
+                        String[] categoryScore = parts[i].split(":");
+                        if (categoryScore.length == 2) {
+                            playerStats.addCategoryScore(categoryScore[0], Integer.parseInt(categoryScore[1]));
+                        }
                     }
-                } else {
-                    // Log error and continue to the next line
-                    System.err.println("Invalid line format: " + line);
+                    playerStatsList.add(playerStats);
                 }
             }
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error reading highscores file.", "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error reading statistics file.", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
-        // Sort the list using the Comparable implementation in the Player class
-        Collections.sort(highestScore, (a, b) -> Integer.compare(b.getScore(), a.getScore()));
+        Collections.sort(playerStatsList);
 
-        scores.setText(""); // Clear previous results
-        for (int i = 0; i < limit && i < highestScore.size(); i++) {
-            scores.append((i + 1) + ".) " + highestScore.get(i).toString() + "\n");
+        scores.setText("Player Name\tScore\tWords Guessed\tGames Played\n");
+        for (PlayerStats stats : playerStatsList) {
+            scores.append(stats.getPlayerName() + "\t" + stats.getScore() + "\t" + stats.getWordsGuessed() + "\t" + stats.getGamesPlayed() + "\n");
+            for (String category : stats.getCategoryScores().keySet()) {
+                scores.append("\t" + category + ": " + stats.getCategoryScores().get(category) + "\n");
+            }
         }
     }
 }

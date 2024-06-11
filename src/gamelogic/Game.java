@@ -6,11 +6,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class Game {
 
@@ -23,11 +20,14 @@ public class Game {
     private String wordToGuess;
     private List<Character> triedLettersList = new ArrayList<>();
     private int incorrectGuesses = 0;
-    String playerName;
+    private String playerName;
     private int score = 0;
+    private int wordsGuessed = 0;
+    private int gamesPlayed = 0;
     private Map<String, List<String>> categoriesMap = new HashMap<>();
-    private static final String STATS_FILE = "data/player_stats.txt";
-    private String category; // Inicijalizacija varijable category
+    private Map<String, Integer> categoryScores = new HashMap<>();
+    public static final String STATS_FILE = "data/player_stats.txt";
+    private String category;
 
     public Game(String playerName) {
         this.playerName = playerName;
@@ -44,7 +44,7 @@ public class Game {
         frame.setLayout(new BorderLayout());
         frame.setLocationRelativeTo(null);
 
-        frame.setJMenuBar(new GameMenuBar(this)); // Dodajemo MenuBar
+        frame.setJMenuBar(new GameMenuBar(this));
 
         gallowsPanel = new JPanel() {
             @Override
@@ -79,7 +79,7 @@ public class Game {
         frame.add(rightPanel, BorderLayout.CENTER);
 
         JPanel inputPanel = new JPanel(new FlowLayout());
-        letterInput = new JTextField(10);  // Increased the input area for more characters
+        letterInput = new JTextField(10);
         JButton submitButton = new JButton("Guess");
         submitButton.addActionListener(new GuessButtonAction(this));
         inputPanel.add(new JLabel("Guess a letter or the word:"));
@@ -94,18 +94,19 @@ public class Game {
     public void startNewGame() {
         triedLettersList.clear();
         incorrectGuesses = 0;
-        score = 0;
-        category = (String) IndexPage.categoryComboBox.getSelectedItem(); // Inicijalizacija kategorije
+        category = (String) IndexPage.categoryComboBox.getSelectedItem();
         List<String> words = categoriesMap.get(category);
         if (words != null && !words.isEmpty()) {
             int randomIndex = new Random().nextInt(words.size());
             wordToGuess = words.get(randomIndex).toUpperCase();
         } else {
-            wordToGuess = "EXAMPLE"; // fallback word in case the category doesn't exist or has no words
+            wordToGuess = "EXAMPLE";
         }
         wordDisplay.setText(generateWordDisplay());
         missedLetters.setText("Missed Letters: \n");
         updateGallows();
+        letterInput.setText("");
+        gamesPlayed++;
     }
 
     public void handleGuess() {
@@ -122,6 +123,8 @@ public class Game {
                 wordDisplay.setText(generateWordDisplay());
                 if (wordDisplay.getText().replace(" ", "").equals(wordToGuess)) {
                     score += 10;
+                    wordsGuessed++;
+                    categoryScores.put(category, categoryScores.getOrDefault(category, 0) + 10);
                     updateScoreLabel();
                     continueOrEndGame(true);
                     return;
@@ -135,6 +138,8 @@ public class Game {
             if (input.equals(wordToGuess)) {
                 wordDisplay.setText(wordToGuess);
                 score += 10;
+                wordsGuessed++;
+                categoryScores.put(category, categoryScores.getOrDefault(category, 0) + 10);
                 updateScoreLabel();
                 continueOrEndGame(true);
                 return;
@@ -154,7 +159,7 @@ public class Game {
     private void continueOrEndGame(boolean guessedWord) {
         if (guessedWord) {
             JOptionPane.showMessageDialog(frame, "Congratulations! You guessed the word!");
-            int choice = JOptionPane.showConfirmDialog(frame, "Continue?", "Game over", JOptionPane.YES_NO_OPTION);
+            int choice = JOptionPane.showConfirmDialog(frame, "You guessed the word! Continue?", "Game over", JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
                 startNewGame();
                 return;
@@ -170,7 +175,7 @@ public class Game {
         StringBuilder display = new StringBuilder();
         for (char c : wordToGuess.toCharArray()) {
             if (c == ' ') {
-                display.append("    ");  // Add spaces for spaces in the word
+                display.append("    ");
             } else if (triedLettersList.contains(c)) {
                 display.append(c).append(" ");
             } else {
@@ -182,37 +187,27 @@ public class Game {
 
     private void drawGallows(Graphics g) {
         g.setColor(Color.BLACK);
-        g.drawLine(0, 0, 0, 200);   // pole
-        g.drawLine(0, 0, 100, 0);  // top beam
-        g.drawLine(100, 0, 100, 20); // rope
+        g.drawLine(0, 0, 0, 200);
+        g.drawLine(0, 0, 100, 0);
+        g.drawLine(100, 0, 100, 20);
 
-        // Head (after 1st wrong guess)
         if (incorrectGuesses >= 1) {
             g.drawOval(80, 20, 40, 40);
         }
-
-        // Body (after 2nd wrong guess)
         if (incorrectGuesses >= 2) {
             g.drawLine(100, 60, 100, 120);
         }
-
-        // Left arm (after 3rd wrong guess)
         if (incorrectGuesses >= 3) {
             g.drawLine(100, 60, 70, 100);
         }
-
-        // Right arm (after 4th wrong guess)
         if (incorrectGuesses >= 4) {
             g.drawLine(100, 60, 130, 100);
         }
-
-        // Left leg (after 5th wrong guess)
         if (incorrectGuesses >= 5) {
-            g.drawLine(100, 120, 70, 170);  // left leg
+            g.drawLine(100, 120, 70, 170);
         }
-        // Right leg (after 6th wrong guess)
         if (incorrectGuesses >= 6) {
-            g.drawLine(100, 120, 130, 170); // right leg
+            g.drawLine(100, 120, 130, 170);
         }
     }
 
@@ -249,7 +244,7 @@ public class Game {
     private void endGame() {
         saveScore();
         frame.dispose();
-        new HighscorePage().setVisible(true);
+        new HighscorePage(this).setVisible(true);
     }
 
     private void updateScoreLabel() {
@@ -258,23 +253,18 @@ public class Game {
 
     public void saveScore() {
         try (FileWriter writer = new FileWriter(STATS_FILE, true)) {
-            writer.write(playerName + " " + score + "\n");
+            writer.write(playerName + " " + score + " " + wordsGuessed + " " + gamesPlayed + " ");
+            for (Map.Entry<String, Integer> entry : categoryScores.entrySet()) {
+                writer.write(entry.getKey() + ":" + entry.getValue() + " ");
+            }
+            writer.write("\n");
         } catch (IOException e) {
             System.out.println("Error writing to file");
         }
     }
 
     public void showAllPlayersStats() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(STATS_FILE))) {
-            String line;
-            StringBuilder stats = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                stats.append(line).append("\n");
-            }
-            JOptionPane.showMessageDialog(frame, stats.toString(), "All Players Stats", JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Error reading statistics file", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        new HighscorePage(this).setVisible(true);
     }
 
     public void showPlayerStats() {
@@ -283,12 +273,26 @@ public class Game {
             StringBuilder stats = new StringBuilder();
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(playerName)) {
-                    stats.append(line).append("\n");
+                    String[] parts = line.split(" ");
+                    if (parts.length >= 4) {
+                        stats.append("Player: ").append(parts[0]).append("\n");
+                        stats.append("Score: ").append(parts[1]).append("\n");
+                        stats.append("Words Guessed: ").append(parts[2]).append("\n");
+                        stats.append("Games Played: ").append(parts[3]).append("\n");
+                        stats.append("Category Scores:\n");
+                        for (int i = 4; i < parts.length; i++) {
+                            stats.append(parts[i]).append("\n");
+                        }
+                    }
                 }
             }
             JOptionPane.showMessageDialog(frame, stats.toString(), "My Stats", JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(frame, "Error reading statistics file", "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public void setVisible(boolean visible) {
+        frame.setVisible(visible);
     }
 }
