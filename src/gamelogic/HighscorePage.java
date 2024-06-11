@@ -8,9 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 public class HighscorePage extends JFrame {
-    private JTextArea scores;
+    private JTable scoreTable;
     private List<PlayerStats> playerStatsList;
 
     public HighscorePage(Game game) {
@@ -19,9 +20,9 @@ public class HighscorePage extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        scores = new JTextArea();
-        scores.setEditable(false);
-        add(new JScrollPane(scores), BorderLayout.CENTER);
+        scoreTable = new JTable();
+        JScrollPane scrollPane = new JScrollPane(scoreTable);
+        add(scrollPane, BorderLayout.CENTER);
 
         loadScores();
 
@@ -76,12 +77,22 @@ public class HighscorePage extends JFrame {
 
         Collections.sort(playerStatsList);
 
-        scores.setText("Player Name\tScore\tWords Guessed\tGames Played\n");
+        String[] columnNames = {"Player Name", "Score", "Words Guessed", "Games Played", "Category Scores"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         for (PlayerStats stats : playerStatsList) {
-            scores.append(stats.getPlayerName() + "\t" + stats.getScore() + "\t" + stats.getWordsGuessed() + "\t" + stats.getGamesPlayed() + "\n");
+            StringBuilder categoryScores = new StringBuilder();
             for (String category : stats.getCategoryScores().keySet()) {
-                scores.append("\t" + category + ": " + stats.getCategoryScores().get(category) + "\n");
+                categoryScores.append(category).append(": ").append(stats.getCategoryScores().get(category)).append(" ");
             }
+            Object[] rowData = {
+                    stats.getPlayerName(),
+                    stats.getScore(),
+                    stats.getWordsGuessed(),
+                    stats.getGamesPlayed(),
+                    categoryScores.toString()
+            };
+            model.addRow(rowData);
         }
+        scoreTable.setModel(model);
     }
 }
