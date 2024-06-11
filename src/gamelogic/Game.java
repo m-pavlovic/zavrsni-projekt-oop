@@ -26,20 +26,14 @@ public class Game {
     String playerName;
     private int score = 0;
     private Map<String, List<String>> categoriesMap = new HashMap<>();
-    String category = IndexPage.categoryComboBox.getSelectedItem().toString();
+    private static final String STATS_FILE = "data/player_stats.txt";
+    private String category; // Inicijalizacija varijable category
 
     public Game(String playerName) {
         this.playerName = playerName;
         loadWordsFromFile();
-        List<String> words = categoriesMap.get(category);
-        if (words != null && !words.isEmpty()) {
-            int randomIndex = new Random().nextInt(words.size());
-            wordToGuess = words.get(randomIndex).toUpperCase();
-            System.out.println(wordToGuess);
-        } else {
-            wordToGuess = "EXAMPLE"; // fallback word in case the category doesn't exist or has no words
-        }
         initializeGUI();
+        startNewGame();
     }
 
     private void initializeGUI() {
@@ -49,6 +43,9 @@ public class Game {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         frame.setLocationRelativeTo(null);
+
+        frame.setJMenuBar(new GameMenuBar(this)); // Dodajemo MenuBar
+
         gallowsPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -71,7 +68,7 @@ public class Game {
         playerNameLabel = new JLabel(playerName);
         scoreLabel = new JLabel("Score: " + score);
 
-        wordDisplay = new JLabel(generateWordDisplay());
+        wordDisplay = new JLabel("");
 
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
@@ -92,6 +89,23 @@ public class Game {
         frame.add(inputPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
+    }
+
+    public void startNewGame() {
+        triedLettersList.clear();
+        incorrectGuesses = 0;
+        score = 0;
+        category = (String) IndexPage.categoryComboBox.getSelectedItem(); // Inicijalizacija kategorije
+        List<String> words = categoriesMap.get(category);
+        if (words != null && !words.isEmpty()) {
+            int randomIndex = new Random().nextInt(words.size());
+            wordToGuess = words.get(randomIndex).toUpperCase();
+        } else {
+            wordToGuess = "EXAMPLE"; // fallback word in case the category doesn't exist or has no words
+        }
+        wordDisplay.setText(generateWordDisplay());
+        missedLetters.setText("Missed Letters: \n");
+        updateGallows();
     }
 
     public void handleGuess() {
@@ -142,18 +156,7 @@ public class Game {
             JOptionPane.showMessageDialog(frame, "Congratulations! You guessed the word!");
             int choice = JOptionPane.showConfirmDialog(frame, "Continue?", "Game over", JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
-                triedLettersList.clear();
-                List<String> words = categoriesMap.get(category);
-                if (words != null && !words.isEmpty()) {
-                    int randomIndex = new Random().nextInt(words.size());
-                    wordToGuess = words.get(randomIndex).toUpperCase();
-                } else {
-                    wordToGuess = "EXAMPLE";
-                }
-                wordDisplay.setText(generateWordDisplay());
-                incorrectGuesses = 0;
-                missedLetters.setText("Missed Letters: \n");
-                updateGallows();
+                startNewGame();
                 return;
             }
         }
@@ -161,6 +164,9 @@ public class Game {
     }
 
     private String generateWordDisplay() {
+        if (wordToGuess == null) {
+            return "";
+        }
         StringBuilder display = new StringBuilder();
         for (char c : wordToGuess.toCharArray()) {
             if (c == ' ') {
@@ -242,7 +248,6 @@ public class Game {
 
     private void endGame() {
         saveScore();
-        saveToFile();
         frame.dispose();
         new HighscorePage().setVisible(true);
     }
@@ -251,20 +256,39 @@ public class Game {
         scoreLabel.setText("Score: " + score);
     }
 
-    public HashMap<String, Integer> saveScore() {
-        HashMap<String, Integer> scores = new HashMap<>();
-        scores.put(playerName, score);
-        return scores;
-    }
-
-    public void saveToFile() {
-        HashMap<String, Integer> scores = saveScore();
-        try (FileWriter writer = new FileWriter("data/highscores", true)) {
-            for (String name : scores.keySet()) {
-                writer.write(name + " " + scores.get(name) + "\n");
-            }
+    public void saveScore() {
+        try (FileWriter writer = new FileWriter(STATS_FILE, true)) {
+            writer.write(playerName + " " + score + "\n");
         } catch (IOException e) {
             System.out.println("Error writing to file");
+        }
+    }
+
+    public void showAllPlayersStats() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(STATS_FILE))) {
+            String line;
+            StringBuilder stats = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stats.append(line).append("\n");
+            }
+            JOptionPane.showMessageDialog(frame, stats.toString(), "All Players Stats", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(frame, "Error reading statistics file", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void showPlayerStats() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(STATS_FILE))) {
+            String line;
+            StringBuilder stats = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith(playerName)) {
+                    stats.append(line).append("\n");
+                }
+            }
+            JOptionPane.showMessageDialog(frame, stats.toString(), "My Stats", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(frame, "Error reading statistics file", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
