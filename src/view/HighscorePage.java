@@ -1,4 +1,8 @@
-package gamelogic;
+package view;
+
+import controller.ExitButtonAction;
+import model.Game;
+import model.PlayerStats;
 
 import javax.swing.*;
 import java.awt.*;

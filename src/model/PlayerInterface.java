@@ -1,4 +1,4 @@
-package gamelogic;
+package model;
 
 public interface PlayerInterface {
     String getName();

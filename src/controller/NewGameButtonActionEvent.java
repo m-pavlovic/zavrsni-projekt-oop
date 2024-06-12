@@ -1,4 +1,4 @@
-package gamelogic;
+package controller;
 
 import java.util.EventObject;
 

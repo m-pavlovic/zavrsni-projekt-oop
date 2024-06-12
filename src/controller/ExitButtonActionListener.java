@@ -1,4 +1,6 @@
-package gamelogic;
+package controller;
+
+import controller.ExitButtonActionEvent;
 
 import java.util.EventListener;
 

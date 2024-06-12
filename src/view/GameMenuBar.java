@@ -1,4 +1,8 @@
-package gamelogic;
+package view;
+
+import controller.ExitButtonAction;
+import controller.NewGameButtonAction;
+import model.Game;
 
 import javax.swing.*;
 

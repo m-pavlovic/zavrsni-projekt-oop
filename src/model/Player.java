@@ -1,4 +1,4 @@
-package gamelogic;
+package model;
 
 public class Player implements PlayerInterface, Comparable<Player> {
     private String name;

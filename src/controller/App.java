@@ -1,4 +1,6 @@
-package gamelogic;
+package controller;
+
+import view.IndexPage;
 
 import javax.swing.*;
 

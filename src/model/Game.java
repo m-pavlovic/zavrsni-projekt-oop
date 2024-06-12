@@ -1,4 +1,9 @@
-package gamelogic;
+package model;
+
+import controller.*;
+import view.GameMenuBar;
+import view.HighscorePage;
+import view.IndexPage;
 
 import javax.swing.*;
 import java.awt.*;

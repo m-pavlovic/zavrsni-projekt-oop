@@ -1,4 +1,6 @@
-package gamelogic;
+package controller;
+
+import controller.GuessButtonActionEvent;
 
 import java.util.EventListener;
 

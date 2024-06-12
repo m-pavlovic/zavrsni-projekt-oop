@@ -1,4 +1,6 @@
-package gamelogic;
+package controller;
+
+import controller.NewGameButtonActionEvent;
 
 import java.util.EventListener;
 
