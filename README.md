@@ -1,4 +1,4 @@
-# Hangman Game
+# Hangman Game by Laura Martinović
 
 Ovaj projekt je razvijen za kolegij "Osnove objektnog programiranja" i koristi MVC arhitekturu kako bi se postigla modularnost i jednostavno održavanje koda.
 
