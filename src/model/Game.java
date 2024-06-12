@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -183,7 +182,7 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
     private void continueOrEndGame(boolean guessedWord) {
         if (guessedWord) {
             JOptionPane.showMessageDialog(frame, "Congratulations! You guessed the word!");
-            int choice = JOptionPane.showConfirmDialog(frame, "You guessed the word! Continue?", "Game over", JOptionPane.YES_NO_OPTION);
+            int choice = JOptionPane.showConfirmDialog(frame, "Continue?", "Game over", JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
                 startNewGame();
                 return;
@@ -274,15 +273,8 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
     }
 
     public void saveScore() {
-        try (FileWriter writer = new FileWriter(STATS_FILE, true)) {
-            writer.write(playerName + " " + score + " " + wordsGuessed + " " + gamesPlayed + " ");
-            for (Map.Entry<String, Integer> entry : categoryScores.entrySet()) {
-                writer.write(entry.getKey() + ":" + entry.getValue() + " ");
-            }
-            writer.write("\n");
-        } catch (IOException e) {
-            System.out.println("Error writing to file");
-        }
+       HighscoreManager highscoreManager = new HighscoreManager();
+       highscoreManager.savePlayerStats(playerName, score, wordsGuessed, gamesPlayed, categoryScores);
     }
 
     public void showAllPlayersStats() {

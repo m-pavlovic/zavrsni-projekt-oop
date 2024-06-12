@@ -18,6 +18,15 @@ public class PlayerStats implements Comparable<PlayerStats> {
         this.categoryScores = new HashMap<>();
     }
 
+    public PlayerStats(String playerName, int score, int wordsGuessed, int gamesPlayed,
+                       Map<String, Integer> categoryScores) {
+        this.playerName = playerName;
+        this.score = score;
+        this.wordsGuessed = wordsGuessed;
+        this.gamesPlayed = gamesPlayed;
+        this.categoryScores = categoryScores;
+    }
+
     public String getPlayerName() {
         return playerName;
     }

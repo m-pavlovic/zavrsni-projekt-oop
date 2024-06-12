@@ -1,6 +1,13 @@
-laura116 0
-lauraa116 0
-test1_11_6 20 2
 luluullulu 10 1 2 Animals:10 
 luluullulu 10 1 2 Animals:10 
 ocaj350302 20 2 3 Animals:20 
+ocaj503029 20 2 2 Animals:20 
+test136 0 0 1 
+test136 0 0 1 
+mar12 30 3 3 Animals:30 
+luna126 40 4 5 Animals:40 
+luna126 10 1 2 Animals:10 
+luna126 10 1 2 Countries:10 
+luna126 20 2 3 Countries:20 
+test_user_1 30 3 3 Animals:30 
+test_user_2 20 2 3 Animals:20 
