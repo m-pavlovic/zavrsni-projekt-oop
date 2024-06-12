@@ -2,8 +2,6 @@ package gamelogic;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -30,7 +28,6 @@ public class IndexPage extends JFrame {
         add(initRightPanel(), BorderLayout.EAST);
         add(initBotPanel(), BorderLayout.SOUTH);
 
-        // Center the game on the screen
         setLocationRelativeTo(null);
 
         JPanel panel = (JPanel) initBotPanel();
@@ -51,10 +48,19 @@ public class IndexPage extends JFrame {
         JButton b2 = new JButton("Exit");
         panel.add(b1);
 
-        b1.addActionListener(new PlayButtonAction(this, enterName));
+        PlayButtonAction playButtonAction = new PlayButtonAction(enterName, categoryComboBox);
+        playButtonAction.setPlayButtonActionListener(event -> {
+            new Game(event.getPlayerName());
+            dispose();
+        });
+        b1.addActionListener(playButtonAction);
+
+        ExitButtonAction exitButtonAction = new ExitButtonAction();
+        exitButtonAction.setExitButtonActionListener(event -> System.exit(0));
+        b2.addActionListener(exitButtonAction);
+
         panel.add(b2);
         panel.add(Box.createVerticalStrut(120));
-        b2.addActionListener(new ExitButtonAction());
         return panel;
     }
 
@@ -100,9 +106,7 @@ public class IndexPage extends JFrame {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine().trim();
 
-                // Check if the line starts with '[' and ends with ']'
                 if (line.startsWith("[") && line.endsWith("]")) {
-                    // Remove '[' and ']' and add the category to the comboBox
                     String category = line.substring(1, line.length() - 1);
                     categoryComboBox.addItem(category);
                 }

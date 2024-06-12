@@ -1,8 +1,7 @@
 package gamelogic;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.EventListener;
 
-public interface PlayButtonActionListener extends ActionListener {
-    void actionPerformed(ActionEvent e);
+public interface PlayButtonActionListener extends EventListener {
+    void playButtonActionPerformed(PlayButtonActionEvent event);
 }

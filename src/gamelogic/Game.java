@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-public class Game {
+public class Game implements GuessButtonActionListener, NewGameButtonActionListener {
 
     private JFrame frame;
     private JTextField letterInput;
@@ -81,7 +81,11 @@ public class Game {
         JPanel inputPanel = new JPanel(new FlowLayout());
         letterInput = new JTextField(10);
         JButton submitButton = new JButton("Guess");
-        submitButton.addActionListener(new GuessButtonAction(this));
+
+        GuessButtonAction guessButtonAction = new GuessButtonAction();
+        guessButtonAction.setGuessButtonActionListener(this);
+        submitButton.addActionListener(guessButtonAction);
+
         inputPanel.add(new JLabel("Guess a letter or the word:"));
         inputPanel.add(letterInput);
         inputPanel.add(submitButton);
@@ -89,6 +93,16 @@ public class Game {
         frame.add(inputPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
+    }
+
+    @Override
+    public void guessButtonActionPerformed(GuessButtonActionEvent event) {
+        handleGuess();
+    }
+
+    @Override
+    public void newGameButtonActionPerformed(NewGameButtonActionEvent event) {
+        startNewGame();
     }
 
     public void startNewGame() {
@@ -154,7 +168,7 @@ public class Game {
             }
         }
         letterInput.setText("");
-        updateScoreLabel(); // Added this line to update the score after an incorrect guess
+        updateScoreLabel();
         if (incorrectGuesses >= 6) {
             JOptionPane.showMessageDialog(frame, "Game over, you lost! The word was: " + wordToGuess);
             endGame();
@@ -174,7 +188,7 @@ public class Game {
     }
 
     private String generateWordDisplay() {
-        if (wordToGuess == null) {  // Moved this line to the top of the method
+        if (wordToGuess == null) {
             return "";
         }
         StringBuilder display = new StringBuilder();
@@ -224,19 +238,19 @@ public class Game {
         String currentCategory = "";
         try (BufferedReader br = new BufferedReader(new FileReader("data/words"))) {
             String line;
-            List<String> words = new ArrayList<>(); // Initialize the list here
+            List<String> words = new ArrayList<>();
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("[")) {
-                    if (words != null && !words.isEmpty()) {
+                    if (!words.isEmpty()) {
                         categoriesMap.put(currentCategory, new ArrayList<>(words));
                     }
                     currentCategory = line.substring(1, line.length() - 1);
-                    words.clear(); // Clear the list for the new category
+                    words.clear();
                 } else {
                     words.add(line);
                 }
             }
-            if (words != null && !words.isEmpty()) {
+            if (!words.isEmpty()) {
                 categoriesMap.put(currentCategory, new ArrayList<>(words));
             }
         } catch (IOException e) {

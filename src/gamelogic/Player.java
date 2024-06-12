@@ -21,7 +21,6 @@ public class Player implements PlayerInterface, Comparable<Player> {
 
     @Override
     public int compareTo(Player other) {
-        // Sortiraj po bodovima u opadajućem redosledu
         return Integer.compare(other.getScore(), this.getScore());
     }
 

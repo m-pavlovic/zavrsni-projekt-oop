@@ -8,8 +8,13 @@ public class GameMenuBar extends JMenuBar {
         JMenuItem newGameItem = new JMenuItem("New Game");
         JMenuItem exitItem = new JMenuItem("Exit");
 
-        newGameItem.addActionListener(e -> game.startNewGame());
-        exitItem.addActionListener(e -> System.exit(0));
+        NewGameButtonAction newGameButtonAction = new NewGameButtonAction();
+        newGameButtonAction.setNewGameButtonActionListener(game);
+        newGameItem.addActionListener(newGameButtonAction);
+
+        ExitButtonAction exitButtonAction = new ExitButtonAction();
+        exitButtonAction.setExitButtonActionListener(event -> System.exit(0));
+        exitItem.addActionListener(exitButtonAction);
 
         gameMenu.add(newGameItem);
         gameMenu.add(exitItem);

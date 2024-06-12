@@ -1,10 +1,7 @@
 package gamelogic;
 
+import java.util.EventListener;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-public interface ExitButtonActionListener extends ActionListener {
-    void actionPerformed(ActionEvent e);
+public interface ExitButtonActionListener extends EventListener {
+    void exitButtonActionPerformed(ExitButtonActionEvent event);
 }
-

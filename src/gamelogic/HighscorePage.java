@@ -44,7 +44,9 @@ public class HighscorePage extends JFrame {
             game.setVisible(true);
         });
 
-        exitButton.addActionListener(e -> System.exit(0));
+        ExitButtonAction exitButtonAction = new ExitButtonAction();
+        exitButtonAction.setExitButtonActionListener(event -> System.exit(0));
+        exitButton.addActionListener(exitButtonAction);
 
         buttonPanel.add(homeButton);
         buttonPanel.add(backButton);
