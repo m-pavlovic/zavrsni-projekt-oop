@@ -22,7 +22,7 @@ Projekt je organiziran prema MVC (Model-View-Controller) arhitekturi kako bi se 
 1. **Preduvjeti:** Osigurajte da imate instaliran JDK (Java Development Kit) na vašem računalu. Za razvoj ovog projekta je korišten JDK 21.
 2. **Kloniranje repozitorija:** Klonirajte repozitorij na vaše računalo:
    ```sh
-   git clone lauramartinovic/zavrsni-projekt-oop
+   git clone https://github.com/lauramartinovic/zavrsni-projekt-oop.git
 
 ## Kako igrati
 
