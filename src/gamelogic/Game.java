@@ -94,7 +94,11 @@ public class Game {
     public void startNewGame() {
         triedLettersList.clear();
         incorrectGuesses = 0;
-        category = (String) IndexPage.categoryComboBox.getSelectedItem();
+        if (IndexPage.categoryComboBox.getSelectedItem() != null) {
+            category = (String) IndexPage.categoryComboBox.getSelectedItem();
+        } else {
+            category = "DEFAULT";
+        }
         List<String> words = categoriesMap.get(category);
         if (words != null && !words.isEmpty()) {
             int randomIndex = new Random().nextInt(words.size());
@@ -150,6 +154,7 @@ public class Game {
             }
         }
         letterInput.setText("");
+        updateScoreLabel(); // Added this line to update the score after an incorrect guess
         if (incorrectGuesses >= 6) {
             JOptionPane.showMessageDialog(frame, "Game over, you lost! The word was: " + wordToGuess);
             endGame();
@@ -169,7 +174,7 @@ public class Game {
     }
 
     private String generateWordDisplay() {
-        if (wordToGuess == null) {
+        if (wordToGuess == null) {  // Moved this line to the top of the method
             return "";
         }
         StringBuilder display = new StringBuilder();
@@ -219,22 +224,20 @@ public class Game {
         String currentCategory = "";
         try (BufferedReader br = new BufferedReader(new FileReader("data/words"))) {
             String line;
-            List<String> words = null;
+            List<String> words = new ArrayList<>(); // Initialize the list here
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("[")) {
                     if (words != null && !words.isEmpty()) {
                         categoriesMap.put(currentCategory, new ArrayList<>(words));
                     }
                     currentCategory = line.substring(1, line.length() - 1);
-                    words = new ArrayList<>();
+                    words.clear(); // Clear the list for the new category
                 } else {
-                    if (words != null) {
-                        words.add(line);
-                    }
+                    words.add(line);
                 }
             }
             if (words != null && !words.isEmpty()) {
-                categoriesMap.put(currentCategory, words);
+                categoriesMap.put(currentCategory, new ArrayList<>(words));
             }
         } catch (IOException e) {
             e.printStackTrace();
