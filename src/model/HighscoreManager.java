@@ -1,14 +1,11 @@
 package model;
 
-import model.PlayerStats;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +19,7 @@ public class HighscoreManager {
         loadPlayerStats();
     }
 
-    private void loadPlayerStats() {
+    private void loadPlayerStats() { //ucitava statistiku igraca iz filea
         try (BufferedReader reader = new BufferedReader(new FileReader(STATS_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -48,6 +45,8 @@ public class HighscoreManager {
         }
     }
 
+
+    //sprema stats igraca u file
     public void savePlayerStats(String playerName, int score, int wordsGuessed, int gamesPlayed,
                                 Map<String, Integer> categoryScores) {
         playerStatsList.add(new PlayerStats(playerName, score, wordsGuessed, gamesPlayed, categoryScores));
@@ -69,8 +68,8 @@ public class HighscoreManager {
         }
     }
 
-    public List<PlayerStats> getTopPlayerStats(int limit) {
-        Collections.sort(playerStatsList);
-        return playerStatsList.subList(0, Math.min(limit, playerStatsList.size()));
-    }
+//    public List<PlayerStats> getTopPlayerStats(int limit) {
+//        Collections.sort(playerStatsList);
+//        return playerStatsList.subList(0, Math.min(limit, playerStatsList.size()));
+//    }
 }

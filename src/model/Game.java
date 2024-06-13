@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
+
+//glavna klasa koja predstavlja igru, implementira sučelja za rukovanje dogadajima pritiska na gumbe
 public class Game implements GuessButtonActionListener, NewGameButtonActionListener {
 
     private JFrame frame;
@@ -40,7 +42,7 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
         startNewGame();
     }
 
-    private void initializeGUI() {
+    private void initializeGUI() { //metoda koja postavlja izgled guija
         frame = new JFrame("Hangman Game");
         frame.setSize(800, 480);
         frame.setResizable(false);
@@ -97,6 +99,8 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
         frame.add(inputPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
+
+
     }
 
     @Override
@@ -109,7 +113,7 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
         startNewGame();
     }
 
-    public void startNewGame() {
+    public void startNewGame() { //za zapocinjanje nove igre
         triedLettersList.clear();
         incorrectGuesses = 0;
         if (IndexPage.categoryComboBox.getSelectedItem() != null) {
@@ -131,7 +135,7 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
         gamesPlayed++;
     }
 
-    public void handleGuess() {
+    public void handleGuess() { //vodi tekstualnii unos korisnika
         String input = letterInput.getText().toUpperCase();
         if (input.length() == 1) {
             char letter = input.charAt(0);
@@ -179,7 +183,7 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
         }
     }
 
-    private void continueOrEndGame(boolean guessedWord) {
+    private void continueOrEndGame(boolean guessedWord) { //provjerava je li igra gotova i postavlja upit za nastavak
         if (guessedWord) {
             JOptionPane.showMessageDialog(frame, "Congratulations! You guessed the word!");
             int choice = JOptionPane.showConfirmDialog(frame, "Continue?", "Game over", JOptionPane.YES_NO_OPTION);
@@ -191,7 +195,7 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
         endGame();
     }
 
-    private String generateWordDisplay() {
+    private String generateWordDisplay() { //generira crtice za rijec
         if (wordToGuess == null) {
             return "";
         }
@@ -208,7 +212,7 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
         return display.toString();
     }
 
-    private void drawGallows(Graphics g) {
+    private void drawGallows(Graphics g) { //crta vjesala
         g.setColor(Color.BLACK);
         g.drawLine(0, 0, 0, 200);
         g.drawLine(0, 0, 100, 0);
@@ -236,9 +240,9 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
 
     private void updateGallows() {
         gallowsPanel.repaint();
-    }
+    } //ponovo crta vjesala
 
-    private void loadWordsFromFile() {
+    private void loadWordsFromFile() { //ucitava rijeci iz filea
         String currentCategory = "";
         try (BufferedReader br = new BufferedReader(new FileReader("data/words"))) {
             String line;
@@ -262,7 +266,7 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
         }
     }
 
-    private void endGame() {
+    private void endGame() { //zavrsava igru i otvara highscore page
         saveScore();
         frame.dispose();
         new HighscorePage(this, false).setVisible(true);
@@ -270,17 +274,21 @@ public class Game implements GuessButtonActionListener, NewGameButtonActionListe
 
     private void updateScoreLabel() {
         scoreLabel.setText("Score: " + score);
-    }
+    } //azurira prikaz bodova
 
-    public void saveScore() {
+    public void saveScore() { //sprema bodove u datoteku
        HighscoreManager highscoreManager = new HighscoreManager();
        highscoreManager.savePlayerStats(playerName, score, wordsGuessed, gamesPlayed, categoryScores);
     }
 
+
+    //prikazuje stats svih igraca
     public void showAllPlayersStats() {
         new HighscorePage(this, false).setVisible(true);
     }
 
+
+    //prikazuje stats trenutnog igraca
     public void showPlayerStats() {
         new HighscorePage(this, true).setVisible(true);
     }
