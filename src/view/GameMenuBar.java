@@ -6,8 +6,12 @@ import model.Game;
 
 import javax.swing.*;
 
+
+//menu bar s opcijama za new game, exit i statse
+//dodaje action listener za svaki item u meniju
 public class GameMenuBar extends JMenuBar {
     public GameMenuBar(Game game) {
+
         JMenu gameMenu = new JMenu("Game");
         JMenuItem newGameItem = new JMenuItem("New Game");
         JMenuItem exitItem = new JMenuItem("Exit");

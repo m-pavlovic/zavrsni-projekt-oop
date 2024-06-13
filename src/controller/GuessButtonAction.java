@@ -3,6 +3,8 @@ package controller;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
+//rukuje dogadajem pritiska na guess gumb, postavlja listener i prosljeduje dogadaj game klasi
 public class GuessButtonAction implements ActionListener {
     private GuessButtonActionListener listener;
 

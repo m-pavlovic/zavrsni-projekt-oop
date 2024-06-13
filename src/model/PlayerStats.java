@@ -1,9 +1,12 @@
 package model;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerStats implements Comparable<PlayerStats> {
+//klasa koja cuva podatke o bodovima, imenu, pogodenim rijecima, bodovima kategorija itd
+
+public class PlayerStats implements PlayerStatsInterface, Comparable<PlayerStats> {
     private String playerName;
     private int score;
     private int wordsGuessed;
@@ -27,26 +30,32 @@ public class PlayerStats implements Comparable<PlayerStats> {
         this.categoryScores = categoryScores;
     }
 
+    @Override
     public String getPlayerName() {
         return playerName;
     }
 
+    @Override
     public int getScore() {
         return score;
     }
 
+    @Override
     public int getWordsGuessed() {
         return wordsGuessed;
     }
 
+    @Override
     public int getGamesPlayed() {
         return gamesPlayed;
     }
 
+    @Override
     public Map<String, Integer> getCategoryScores() {
         return categoryScores;
     }
 
+    @Override
     public void addCategoryScore(String category, int score) {
         categoryScores.put(category, score);
     }
